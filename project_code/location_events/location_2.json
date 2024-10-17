@@ -1,0 +1,58 @@
+[
+    {
+        "primary_attribute": "Agililty",
+        "secondary_attribute": "Strength",
+        "prompt_text": "A fast-moving spell is coming your way. What will you do?",
+        "pass": {
+            "message": "You dodged the spell and advanced safely."
+        },
+        "fail": {
+            "message": "The spell hit you, and you're knocked back!"
+        },
+        "partial_pass": {
+            "message": "You almost dodged the spell, but it grazed you."
+        }
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Agility",
+        "prompt_text": "You come across a locked door with a giant lock. What will you do?",
+        "pass": {
+            "message": "You broke the lock and proceeded through the door."
+        },
+        "fail": {
+            "message": "You weren't strong enough to break the lock."
+        },
+        "partial_pass": {
+            "message": "You managed to damage the lock, but it still holds."
+        }
+    },
+    {
+        "primary_attribute": "Intelligence",
+        "secondary_attribute": "Agility",
+        "prompt_text": "You find a complex potion brewing station. Do you attempt to finish the potion?",
+        "pass": {
+            "message": "Your knowledge of potions paid off! You successfully brewed the potion and gained a useful item."
+        },
+        "fail": {
+            "message": "You misread an ingredient, and the potion exploded!"
+        },
+        "partial_pass": {
+            "message": "The potion brewed, but its effecs are uncertain..."
+        }
+    },
+    {
+        "primary_attribute": "Agility",
+        "secondary_attribute": "Intelligence",
+        "prompt_text": "A tricky staircase shifts beneath your feet. Can you keep your balance?",
+        "pass": {
+            "message": "You swiftly regained your balance and made it safely to the next level."
+        },
+        "fail": {
+            "message": "You lost your balance and tumbled down the stairs!"
+        },
+        "partial_pass": {
+            "message": "You wobbled but managed to stay on your feet."
+        }
+    }
+]

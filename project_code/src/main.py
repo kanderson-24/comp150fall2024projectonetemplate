@@ -4,6 +4,8 @@ import random
 from typing import List, Optional
 from enum import Enum
 
+def roll_dice():
+    return random.randint(1, 6)
 
 class EventStatus(Enum):
     UNKNOWN = "unknown"
@@ -26,19 +28,31 @@ class Statistic:
     def modify(self, amount: int):
         self.value = max(self.min_value, min(self.max_value, self.value + amount))
 
+class CharacterType(Enum):
+    STUDENT = "Student"
+    PROFESSOR = "Professor"
 
 class Character:
-    def __init__(self, name: str = "Bob"):
+    def __init__(self, name: str = "Unnamed", char_type: CharacterType = CharacterType.STUDENT):
         self.name = name
-        self.strength = Statistic("Strength", description="Strength is a measure of physical power.")
-        self.intelligence = Statistic("Intelligence", description="Intelligence is a measure of cognitive ability.")
-        # Add more stats as needed
+        self.char_type = char_type 
+        if self.char_type == CharacterType.STUDENT:
+            self.strength = Statistic("Stength", value=5, description="Physical power of the student.")
+            self.intelligence = Statistic("Intelligence", value=10, description="Studen's cognitive ability.")
+            self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
+        elif self.char_type == CharacterType.PROFESSOR:
+            self.strength = Statistic("Strength", value=10, description="Physical power of the professor.")
+            self.intelligence = Statistic("Intelligence", value=15, description="Professor's cognitive ability.")
+            self.agility = Statistic("Agility", value=8, description="Professor's agility in movement.")
+        else:
+            raise ValueError("Invalid character type.")
 
     def __str__(self):
-        return f"Character: {self.name}, Strength: {self.strength}, Intelligence: {self.intelligence}"
+        return (f"Character: {self.name}, Type: {self.char_type.value}, "
+                f"Strength: {self.strength}, Intelligence: {self.intelligence}, Agility: {self.agility}")
 
     def get_stats(self):
-        return [self.strength, self.intelligence]  # Extend this list if there are more stats
+        return [self.strength, self.intelligence, self.agility]  # Extend this list if there are more stats
 
 
 class Event:
@@ -58,14 +72,21 @@ class Event:
         self.resolve_choice(character, chosen_stat)
 
     def resolve_choice(self, character: Character, chosen_stat: Statistic):
-        if chosen_stat.name == self.primary_attribute:
+        dice_roll = roll_dice()
+        print(f"Dice roll: {dice_roll}")
+        success_threshold = 4
+        if chosen_stat.value >= 10:
+            success_threshold -= 1
+        print(f"Attempting to solve the challenge with {chosen_stat.name}...")
+        if dice_roll >= success_threshold and chosen_stat.name == self.primary_attribute:
             self.status = EventStatus.PASS
             print(self.pass_message)
-        elif chosen_stat.name == self.secondary_attribute:
+        elif dice_roll >= success_threshold - 1 and chosen_stat.name == self.secondary_attribute:
             self.status = EventStatus.PARTIAL_PASS
             print(self.partial_pass_message)
         else:
             self.status = EventStatus.FAIL
+            print(f"{character.name} attempted to use {chosen_stat.name} but failed.")
             print(self.fail_message)
 
 
@@ -128,9 +149,11 @@ def start_game():
     characters = [Character(f"Character_{i}") for i in range(3)]
 
     # Load events from the JSON file
-    events = load_events_from_json('project_code/location_events/location_1.json')
+    events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
+    events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
 
-    locations = [Location(events)]
+    all_events = events_location_1 + events_location_2
+    locations = [Location(all_events)]
     game = Game(parser, characters, locations)
     game.start()
 
