@@ -65,19 +65,22 @@ class Event:
         self.partial_pass_message = data['partial_pass']['message']
         self.status = EventStatus.UNKNOWN
 
-    def execute(self, party: List[Character], parser):
-        print(self.prompt_text)
-        character = parser.select_party_member(party)
+    def execute(self, character: Character, parser):
+        print(f"Dumbledore: {self.prompt_text}")
+
         chosen_stat = parser.select_stat(character)
+
         self.resolve_choice(character, chosen_stat)
 
     def resolve_choice(self, character: Character, chosen_stat: Statistic):
         dice_roll = roll_dice()
         print(f"Dice roll: {dice_roll}")
+
         success_threshold = 4
         if chosen_stat.value >= 10:
             success_threshold -= 1
         print(f"Attempting to solve the challenge with {chosen_stat.name}...")
+
         if dice_roll >= success_threshold and chosen_stat.name == self.primary_attribute:
             self.status = EventStatus.PASS
             print(self.pass_message)
@@ -146,7 +149,34 @@ def load_events_from_json(file_path: str) -> List[Event]:
 
 def start_game():
     parser = UserInputParser()
-    characters = [Character(f"Character_{i}") for i in range(3)]
+
+    print("Dumbledore: Welcome, young wizard! The path ahead is filled with challenges, but I have no doubt that you are up to the task.")
+
+    print("Welcome to the adventure! Choose your character:")
+    print("1. Harry Potter")
+    print("2. Hermione Granger")
+    print("3. Ron Weasley")
+
+    character_choice = int(input("Enter the number of the character you want to play as: "))
+
+    if character_choice == 1:
+        chosen_character = Character(name = "Harry Potter", char_type=CharacterType.STUDENT)
+        chosen_character.strength = Statistic("Strength", value=10)
+        chosen_character.intelligence = Statistic("Intelligence", value=8)
+        chosen_character.agility = Statistic("Agility", value=12)
+    elif character_choice == 2:
+        chosen_character = Character(name="Hermione Granger", char_type=CharacterType.STUDENT)
+        chosen_character.strength = Statistic("Strength", value=5)
+        chosen_character.intelligence = Statistic("Intelligence", value=15)
+        chosen_character.agility = Statistic("Agility", value=10)
+    elif character_choice == 3:
+        chosen_character = Character(name="Ron Weasley", char_type=CharacterType.STUDENT)
+        chosen_character.strength = Statistic("Strength", value=8)
+        chosen_character.intelligence = Statistic("Intelligence", value=7)
+        chosen_character.agility = Statistic("Agility", value=9)
+    else:
+        print("Invalid choice, defaulting to Harry Potter.")
+        chosen_character = Character(name="Harry Potter", char_type=CharacterType.STUDENT)
 
     # Load events from the JSON file
     events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
@@ -154,7 +184,7 @@ def start_game():
 
     all_events = events_location_1 + events_location_2
     locations = [Location(all_events)]
-    game = Game(parser, characters, locations)
+    game = Game(parser, [chosen_character], locations)
     game.start()
 
 
