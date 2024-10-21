@@ -54,5 +54,33 @@
         "partial_pass": {
             "message": "You wobbled but managed to stay on your feet."
         }
+    },
+    {
+        "primary_attribute": "Intelligence", 
+        "secondary_attribute": "Agility", 
+        "prompt_text": "Voldemort casts a deadly curse at you! What will you do?",
+        "pass": {
+            "message": "You successfully blocked the curse with your knowledge of counter-spells!"
+        },
+        "fail": {
+            "message": "The curse strikes you, causing immense pain!"
+        },
+        "partial_pass": {
+            "message": "You dodged most of the curse, but it grazed you!"
+        }
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Agility",
+        "prompt_text": "Voldemort lunges are you with dark magic. Will you fight back?",
+        "pass": {
+            "message": "You fought back with great force, causing Voldemort to retreat!"
+        },
+        "fail": {
+            "message": "Voldemort's dark magic overwhelms you!"
+        },
+        "partial_pass": {
+            "message": "You pushed Voldemort back, but the fight continues!"
+        }
     }
 ]

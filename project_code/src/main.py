@@ -102,24 +102,56 @@ class Location:
 
 
 class Game:
-    def __init__(self, parser, characters: List[Character], locations: List[Location]):
+    def __init__(self, parser, character: Character, locations: List[Location]):
         self.parser = parser
-        self.party = characters
+        self.character = character
         self.locations = locations
         self.continue_playing = True
+        self.voldemort_defeated = False
+        self.events_conmpleted = 0
+        self.required_events_to_trigger_battle = 3
 
     def start(self):
         while self.continue_playing:
             location = random.choice(self.locations)
             event = location.get_event()
-            event.execute(self.party, self.parser)
-            if self.check_game_over():
-                self.continue_playing = False
+            event.execute(self.character, self.parser)
+            if event.status == EventStatus.PASS or event.status == EventStatus.PARTIAL_PASS:
+                self.events_conmpleted += 1
+                print(f"Completed events: {self.events_conmpleted}/{self.required_events_to_trigger_battle}")
+            if self.events_conmpleted >= self.required_events_to_trigger_battle:
+                self.voldemort_battle()
+                break
         print("Game Over.")
 
-    def check_game_over(self):
-        return len(self.party) == 0
+    def check_for_final_battle(self):
+        return not self.voldemort_defeated and len(self.locations[0].events) <= 1
+    
+    def voldemort_battle(self):
+        print("Dumbledore: This it it... your final battle against Voldemort!")
+        rounds = 2
+        success_count = 0
 
+        for _ in range(rounds):
+            event = random.choice(self.locations[0].events[-2:])
+            event.execute(self.character, self.parser)
+            if event.status == EventStatus.PASS:
+                success_count += 1
+            elif event.status == EventStatus.FAIL:
+                success_count -= 1
+        
+            if success_count > 0:
+                print(f"Well done! You have the upper hand over Voldemort!")
+            else:
+                print(f"Voldemort is gaining the upper hand")
+
+        if success_count > 0:
+            print("Congratulations! You have defeated Voldemort!")
+            self.voldemort_defeated = True
+        else:
+            print("Voldemort has defeated you... Better luck next time.")
+
+        self.continue_playing = False
 
 class UserInputParser:
     def parse(self, prompt: str) -> str:
@@ -184,7 +216,7 @@ def start_game():
 
     all_events = events_location_1 + events_location_2
     locations = [Location(all_events)]
-    game = Game(parser, [chosen_character], locations)
+    game = Game(parser, chosen_character, locations)
     game.start()
 
 
