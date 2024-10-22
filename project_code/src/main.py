@@ -28,31 +28,41 @@ class Statistic:
     def modify(self, amount: int):
         self.value = max(self.min_value, min(self.max_value, self.value + amount))
 
-class CharacterType(Enum):
-    STUDENT = "Student"
-    PROFESSOR = "Professor"
-
 class Character:
-    def __init__(self, name: str = "Unnamed", char_type: CharacterType = CharacterType.STUDENT):
+    def __init__(self, name: str):
         self.name = name
-        self.char_type = char_type 
-        if self.char_type == CharacterType.STUDENT:
-            self.strength = Statistic("Stength", value=5, description="Physical power of the student.")
-            self.intelligence = Statistic("Intelligence", value=10, description="Student's cognitive ability.")
-            self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
-        elif self.char_type == CharacterType.PROFESSOR:
-            self.strength = Statistic("Strength", value=10, description="Physical power of the professor.")
-            self.intelligence = Statistic("Intelligence", value=15, description="Professor's cognitive ability.")
-            self.agility = Statistic("Agility", value=8, description="Professor's agility in movement.")
-        else:
-            raise ValueError("Invalid character type.")
+        self.statistics = []
 
     def __str__(self):
-        return (f"Character: {self.name}, Type: {self.char_type.value}, "
-                f"Strength: {self.strength}, Intelligence: {self.intelligence}, Agility: {self.agility}")
+        return f"Character: {self.name}" + f" ({type(self).__name__})" + f"\nStats: {', '.join([str(stat) for stat in self.statistics])}"
 
     def get_stats(self):
-        return [self.strength, self.intelligence, self.agility]  # Extend this list if there are more stats
+        return self.statistics # Extend this list if there are more stats
+
+
+class Professor(Character):
+    def __init__(self, name: str = "Unnamed"):
+        super().__init__(name)
+        self.strength = Statistic("Strength", value=10, description="Physical power of the professor.")
+        self.statistics.append(self.strength)
+        self.intelligence = Statistic("Intelligence", value=15, description="Professor's cognitive ability.")
+        self.statistics.append(self.intelligence)
+        self.agility = Statistic("Agility", value=8, description="Professor's agility in movement.")
+        self.statistics.append(self.agility)
+
+
+
+class Student(Character):
+    def __init__(self, name: str = "Unnamed"):
+        super().__init__(name)
+        self.strength = Statistic("Strength", value=5, description="Physical power of the student.")
+        self.statistics.append(self.strength)
+        self.intelligence = Statistic("Intelligence", value=10, description="Student's cognitive ability.")
+        self.statistics.append(self.intelligence)
+        self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
+        self.statistics.append(self.agility)
+
+
 
 
 class Event:
@@ -195,44 +205,42 @@ def start_game():
 
     print("Dumbledore: Welcome, young wizard! The path ahead is filled with challenges, but I have no doubt that you are up to the task.")
 
-    characters = {
-        "1": "Harry Potter", 
+    character_names = {
+        "1": "Harry Potter",
         "2": "Hermione Granger",
         "3": "Ron Weasley"
     }
 
+    characters: List[Character] = [Student(name) for name in character_names.values()]
+
     print("Welcome to the adventure! Choose your character:")
-    for number, name in characters.items():
-        print(f"{number}. {name}")
+    for number, character in enumerate(characters, start=1):
+        print(f"{number}. {character.name}")
 
     while True:
-        character_choice = input("Enter the number or name of the Character you want to play as: ").strip().lower()
+        character_choice = input("Enter the number or name of the character you want to play as: ").strip().lower()
 
-        if character_choice in ["1", "harry potter"]:
-            chosen_character = Character(name = "Harry Potter", char_type=CharacterType.STUDENT)
-            chosen_character.strength = Statistic("Strength", value=10)
-            chosen_character.intelligence = Statistic("Intelligence", value=8)
-            chosen_character.agility = Statistic("Agility", value=12)
-        elif character_choice in ["2", "hermione granger"]:
-            chosen_character = Character(name="Hermione Granger", char_type=CharacterType.STUDENT)
-            chosen_character.strength = Statistic("Strength", value=5)
-            chosen_character.intelligence = Statistic("Intelligence", value=15)
-            chosen_character.agility = Statistic("Agility", value=10)
-        elif character_choice in ["3", "ron weasley"]:
-            chosen_character = Character(name="Ron Weasley", char_type=CharacterType.STUDENT)
-            chosen_character.strength = Statistic("Strength", value=8)
-            chosen_character.intelligence = Statistic("Intelligence", value=7)
-            chosen_character.agility = Statistic("Agility", value=9)
+        # Check if the input is a valid number
+        if character_choice in character_names:
+            chosen_character = next(character for character in characters if character.name.lower() == character_names[character_choice].lower())
+            break  # Exit the loop after a valid choice
+        # Check if the input is a valid character name
+        elif character_choice in (name.lower() for name in character_names.values()):
+            chosen_character = next(character for character in characters if character.name.lower() == character_choice)
+            break  # Exit the loop after a valid choice
         else:
-            print("Invalid input. Please enter either the number or name of a character (Harry Potter, Hermione Grander, Ron Weasley).")
+            print("Invalid input. Please enter either the number or name of a character (Harry Potter, Hermione Granger, Ron Weasley).")
 
-        events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
-        events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
+    # Proceed with the chosen character
+    print(f"You have chosen: {chosen_character.name}")
 
-        all_events = events_location_1 + events_location_2
-        locations = [Location(all_events)]
-        game = Game(parser, chosen_character, locations)
-        game.start()
+    events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
+    events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
+
+    all_events = events_location_1 + events_location_2
+    locations = [Location(all_events)]
+    game = Game(parser, chosen_character, locations)
+    game.start()
 
 if __name__ == '__main__':
     start_game()
