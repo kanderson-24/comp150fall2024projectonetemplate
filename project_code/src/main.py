@@ -51,7 +51,6 @@ class Professor(Character):
         self.statistics.append(self.agility)
 
 
-
 class Student(Character):
     def __init__(self, name: str = "Unnamed"):
         super().__init__(name)
@@ -61,8 +60,6 @@ class Student(Character):
         self.statistics.append(self.intelligence)
         self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
         self.statistics.append(self.agility)
-
-
 
 
 class Event:
@@ -193,12 +190,10 @@ class UserInputParser:
         choice = int(self.parse("Enter the number of the stat to use: ")) - 1
         return stats[choice]
 
-
 def load_events_from_json(file_path: str) -> List[Event]:
     with open(file_path, 'r') as file:
         data = json.load(file)
     return [Event(event_data) for event_data in data]
-
 
 def start_game():
     parser = UserInputParser()
