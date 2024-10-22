@@ -1,24 +1,15 @@
-[{
-  "primary_attribute": "Intelligence",
-  "secondary_attribute": "Strength",
-  "prompt_text": "A mysterious door blocks your path, with a riddle inscribed. What will you do?",
-  "pass": {
-    "message": "You solved the riddle and pushed the door open. You may proceed."
-  },
-  "fail": {
-    "message": "You failed to solve the riddle and push the door open. You must find another way."
-  },
-  "partial_pass": {
-    "message": "You managed to solve the riddle or push the door, but not both. You made some progress, but the door remains closed."
-  }
-},
+[
   {
     "primary_attribute": "Intelligence",
     "secondary_attribute": "Strength",
     "prompt_text": "A mysterious door blocks your path, with a riddle inscribed. What will you do?",
-    "pass": {
-      "message": "You solved the riddle and pushed the door open. You may proceed."
-    },
+    "options": [
+     {"choice_text": "Solve the riddle", "associated_stat": "Intelligence"},
+     {"choice_text": "Force the door open", "associated_stat": "Strength"}
+   ],
+   "pass": {
+     "message": "You solved the riddle and pushed the door open. You may proceed."
+   },
     "fail": {
       "message": "You failed to solve the riddle and push the door open. You must find another way."
     },
@@ -26,7 +17,4 @@
       "message": "You managed to solve the riddle or push the door, but not both. You made some progress, but the door remains closed."
     }
   }
-
-
-
 ]

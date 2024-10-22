@@ -60,15 +60,24 @@ class Event:
         self.primary_attribute = data['primary_attribute']
         self.secondary_attribute = data['secondary_attribute']
         self.prompt_text = data['prompt_text']
+        self.options = data['options']
         self.pass_message = data['pass']['message']
         self.fail_message = data['fail']['message']
         self.partial_pass_message = data['partial_pass']['message']
         self.status = EventStatus.UNKNOWN
+        self.is_voldemort_event = data.get('is_voldemort_event', False)
 
     def execute(self, character: Character, parser):
         print(f"Dumbledore: {self.prompt_text}")
+        print("What will you do?")
+        for idx, option in enumerate(self.options):
+            print(f"{idx + 1}. {option['choice_text']}")
 
-        chosen_stat = parser.select_stat(character)
+        choice = int(parser.parse("Enter the number of your choice: ")) - 1
+        selected_option = self.options[choice]
+        chosen_stat_name = selected_option['associated_stat']
+
+        chosen_stat = next(stat for stat in character.get_stats() if stat.name == chosen_stat_name)
 
         self.resolve_choice(character, chosen_stat)
 
@@ -100,7 +109,6 @@ class Location:
     def get_event(self) -> Event:
         return random.choice(self.events)
 
-
 class Game:
     def __init__(self, parser, character: Character, locations: List[Location]):
         self.parser = parser
@@ -108,33 +116,36 @@ class Game:
         self.locations = locations
         self.continue_playing = True
         self.voldemort_defeated = False
-        self.events_conmpleted = 0
+        self.events_completed = 0
         self.required_events_to_trigger_battle = 3
 
     def start(self):
         while self.continue_playing:
             location = random.choice(self.locations)
-            event = location.get_event()
+            regular_events = [event for event in location.events if not event.is_voldemort_event]
+            event = random.choice(regular_events)
             event.execute(self.character, self.parser)
-            if event.status == EventStatus.PASS or event.status == EventStatus.PARTIAL_PASS:
-                self.events_conmpleted += 1
-                print(f"Completed events: {self.events_conmpleted}/{self.required_events_to_trigger_battle}")
-            if self.events_conmpleted >= self.required_events_to_trigger_battle:
+
+            if event.status == EventStatus.PASS:
+                self.events_completed += 1
+                print(f"Completed events: {self.events_completed}/{self.required_events_to_trigger_battle}")
+            if self.events_completed >= self.required_events_to_trigger_battle:
                 self.voldemort_battle()
                 break
         print("Game Over.")
-
-    def check_for_final_battle(self):
-        return not self.voldemort_defeated and len(self.locations[0].events) <= 1
     
     def voldemort_battle(self):
         print("Dumbledore: This it it... your final battle against Voldemort!")
         rounds = 2
         success_count = 0
 
+        location = random.choice(self.locations)
+        voldemort_events = [event for event in location.events if event.is_voldemort_event]
+
         for _ in range(rounds):
-            event = random.choice(self.locations[0].events[-2:])
+            event = random.choice(voldemort_events)
             event.execute(self.character, self.parser)
+
             if event.status == EventStatus.PASS:
                 success_count += 1
             elif event.status == EventStatus.FAIL:

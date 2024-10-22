@@ -3,6 +3,10 @@
         "primary_attribute": "Agililty",
         "secondary_attribute": "Strength",
         "prompt_text": "A fast-moving spell is coming your way. What will you do?",
+        "options": [
+            {"choice_text": "Dodge the spell", "associated_stat": "Agility"},
+            {"choice_text": "Block the spell with brute force", "associated_stat": "Strength"}
+        ],
         "pass": {
             "message": "You dodged the spell and advanced safely."
         },
@@ -11,12 +15,17 @@
         },
         "partial_pass": {
             "message": "You almost dodged the spell, but it grazed you."
-        }
+        },
+        "is_voldemort_event": false
     },
     {
         "primary_attribute": "Strength",
         "secondary_attribute": "Agility",
         "prompt_text": "You come across a locked door with a giant lock. What will you do?",
+        "options": [
+            {"choice_text": "Break the lock with your strength", "associated_stat": "Strength"},
+            {"choice_text": "Search for another way around", "associated_stat": "Agility"}
+        ],
         "pass": {
             "message": "You broke the lock and proceeded through the door."
         },
@@ -25,12 +34,17 @@
         },
         "partial_pass": {
             "message": "You managed to damage the lock, but it still holds."
-        }
+        },
+        "is_voldemort_event": false
     },
     {
         "primary_attribute": "Intelligence",
         "secondary_attribute": "Agility",
         "prompt_text": "You find a complex potion brewing station. Do you attempt to finish the potion?",
+        "options": [
+            {"choice_text": "Carefully follow the instructions to brew the potion", "associated_stat": "Intelligence"},
+            {"choice_text": "Quickly mix the ingredients and hope for the best", "associated_stat": "Agility"}
+        ],
         "pass": {
             "message": "Your knowledge of potions paid off! You successfully brewed the potion and gained a useful item."
         },
@@ -39,12 +53,17 @@
         },
         "partial_pass": {
             "message": "The potion brewed, but its effecs are uncertain..."
-        }
+        },
+        "is_voldemort_event": false
     },
     {
         "primary_attribute": "Agility",
         "secondary_attribute": "Intelligence",
         "prompt_text": "A tricky staircase shifts beneath your feet. Can you keep your balance?",
+        "options": [
+            {"choice_text": "Quickly adjust and balance yourself", "associated_stat": "Agility"},
+            {"choice_text": "Analyze the movement and time your steps carefully", "associated_stat": "Intelligence"}
+        ],
         "pass": {
             "message": "You swiftly regained your balance and made it safely to the next level."
         },
@@ -53,12 +72,17 @@
         },
         "partial_pass": {
             "message": "You wobbled but managed to stay on your feet."
-        }
+        },
+        "is_voldemort_event": false
     },
     {
         "primary_attribute": "Intelligence", 
         "secondary_attribute": "Agility", 
         "prompt_text": "Voldemort casts a deadly curse at you! What will you do?",
+        "options": [
+            {"choice_text": "Use your knowledge of counter-spells to block the curse", "associated_stat": "Intelligence"},
+            {"choice_text": "Quickly dodge the curse", "associated_stat": "Agility"}
+        ],
         "pass": {
             "message": "You successfully blocked the curse with your knowledge of counter-spells!"
         },
@@ -67,12 +91,17 @@
         },
         "partial_pass": {
             "message": "You dodged most of the curse, but it grazed you!"
-        }
+        },
+        "is_voldemort_event": true
     },
     {
         "primary_attribute": "Strength",
         "secondary_attribute": "Agility",
         "prompt_text": "Voldemort lunges are you with dark magic. Will you fight back?",
+        "options": [
+            {"choice_text": "Counter his attack with brute strength", "associated_stat": "Strength"},
+            {"choice_text": "Evade his attack and find a better position", "associated_stat": "Agility"}
+        ],
         "pass": {
             "message": "You fought back with great force, causing Voldemort to retreat!"
         },
@@ -81,6 +110,7 @@
         },
         "partial_pass": {
             "message": "You pushed Voldemort back, but the fight continues!"
-        }
+        },
+        "is_voldemort_event": true
     }
 ]
