@@ -38,7 +38,7 @@ class Character:
         self.char_type = char_type 
         if self.char_type == CharacterType.STUDENT:
             self.strength = Statistic("Stength", value=5, description="Physical power of the student.")
-            self.intelligence = Statistic("Intelligence", value=10, description="Studen's cognitive ability.")
+            self.intelligence = Statistic("Intelligence", value=10, description="Student's cognitive ability.")
             self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
         elif self.char_type == CharacterType.PROFESSOR:
             self.strength = Statistic("Strength", value=10, description="Physical power of the professor.")
@@ -195,41 +195,44 @@ def start_game():
 
     print("Dumbledore: Welcome, young wizard! The path ahead is filled with challenges, but I have no doubt that you are up to the task.")
 
+    characters = {
+        "1": "Harry Potter", 
+        "2": "Hermione Granger",
+        "3": "Ron Weasley"
+    }
+
     print("Welcome to the adventure! Choose your character:")
-    print("1. Harry Potter")
-    print("2. Hermione Granger")
-    print("3. Ron Weasley")
+    for number, name in characters.items():
+        print(f"{number}. {name}")
 
-    character_choice = int(input("Enter the number of the character you want to play as: "))
+    while True:
+        character_choice = input("Enter the number or name of the Character you want to play as: ").strip().lower()
 
-    if character_choice == 1:
-        chosen_character = Character(name = "Harry Potter", char_type=CharacterType.STUDENT)
-        chosen_character.strength = Statistic("Strength", value=10)
-        chosen_character.intelligence = Statistic("Intelligence", value=8)
-        chosen_character.agility = Statistic("Agility", value=12)
-    elif character_choice == 2:
-        chosen_character = Character(name="Hermione Granger", char_type=CharacterType.STUDENT)
-        chosen_character.strength = Statistic("Strength", value=5)
-        chosen_character.intelligence = Statistic("Intelligence", value=15)
-        chosen_character.agility = Statistic("Agility", value=10)
-    elif character_choice == 3:
-        chosen_character = Character(name="Ron Weasley", char_type=CharacterType.STUDENT)
-        chosen_character.strength = Statistic("Strength", value=8)
-        chosen_character.intelligence = Statistic("Intelligence", value=7)
-        chosen_character.agility = Statistic("Agility", value=9)
-    else:
-        print("Invalid choice, defaulting to Harry Potter.")
-        chosen_character = Character(name="Harry Potter", char_type=CharacterType.STUDENT)
+        if character_choice in ["1", "harry potter"]:
+            chosen_character = Character(name = "Harry Potter", char_type=CharacterType.STUDENT)
+            chosen_character.strength = Statistic("Strength", value=10)
+            chosen_character.intelligence = Statistic("Intelligence", value=8)
+            chosen_character.agility = Statistic("Agility", value=12)
+        elif character_choice in ["2", "hermione granger"]:
+            chosen_character = Character(name="Hermione Granger", char_type=CharacterType.STUDENT)
+            chosen_character.strength = Statistic("Strength", value=5)
+            chosen_character.intelligence = Statistic("Intelligence", value=15)
+            chosen_character.agility = Statistic("Agility", value=10)
+        elif character_choice in ["3", "ron weasley"]:
+            chosen_character = Character(name="Ron Weasley", char_type=CharacterType.STUDENT)
+            chosen_character.strength = Statistic("Strength", value=8)
+            chosen_character.intelligence = Statistic("Intelligence", value=7)
+            chosen_character.agility = Statistic("Agility", value=9)
+        else:
+            print("Invalid input. Please enter either the number or name of a character (Harry Potter, Hermione Grander, Ron Weasley).")
 
-    # Load events from the JSON file
-    events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
-    events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
+        events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
+        events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
 
-    all_events = events_location_1 + events_location_2
-    locations = [Location(all_events)]
-    game = Game(parser, chosen_character, locations)
-    game.start()
-
+        all_events = events_location_1 + events_location_2
+        locations = [Location(all_events)]
+        game = Game(parser, chosen_character, locations)
+        game.start()
 
 if __name__ == '__main__':
     start_game()
