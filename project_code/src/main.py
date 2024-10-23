@@ -32,12 +32,25 @@ class Character:
     def __init__(self, name: str):
         self.name = name
         self.statistics = []
+        self.inventory = []
 
     def __str__(self):
         return f"Character: {self.name}" + f" ({type(self).__name__})" + f"\nStats: {', '.join([str(stat) for stat in self.statistics])}"
 
     def get_stats(self):
         return self.statistics # Extend this list if there are more stats
+    
+    def add_item_to_inventory(self, item):
+        self.inventory.append(item)
+        print(f"{self.name} added {item.name} to their inventory!")
+
+    def use_item(self, item_name):
+        for item in self.inventory:
+            if item.name.lower() == item_name.lower():
+                item.apply_boost(self)
+                self.inventory.remove(item)
+                return True
+        return False
 
 
 class Professor(Character):
@@ -54,12 +67,33 @@ class Professor(Character):
 class Student(Character):
     def __init__(self, name: str = "Unnamed"):
         super().__init__(name)
+        if name == "Harry Potter":
+            self.primary_stat = "Agility"
+        if name == "Hermione Granger":
+            self.primary_stat = "Intelligence"
+        if name == "Ron Weasley":
+            self.primary_stat = "Strength"
+
         self.strength = Statistic("Strength", value=5, description="Physical power of the student.")
         self.statistics.append(self.strength)
         self.intelligence = Statistic("Intelligence", value=10, description="Student's cognitive ability.")
         self.statistics.append(self.intelligence)
         self.agility = Statistic("Agility", value=12, description="Student's agility in movement.")
         self.statistics.append(self.agility)
+
+class Item:
+    def __init__(self, name: str, stat_to_boost: str, boost_amount: int):
+        self.name = name
+        self.stat_to_boost = stat_to_boost
+        self.boost_amount = boost_amount
+
+    def __str__(self):
+        return f"Item: {self.name}, Boosts {self.stat_to_boost} by {self.boost_amount}"
+    
+    def apply_boost(self, character: Character):
+        stat = next(stat for stat in character.get_stats() if stat.name == self.stat_to_boost)
+        stat.modify(self.boost_amount)
+        print(f"{character.name} received {self.name}, boosting {self.stat_to_boost} by {self.boost_amount}!")
 
 
 class Event:
@@ -93,6 +127,9 @@ class Event:
         print(f"Dice roll: {dice_roll}")
 
         success_threshold = 4
+        if chosen_stat.name == character.primary_stat:
+            print(f"{character.name} is using their primary stat: {chosen_stat.name}")
+            success_threshold -= 1
         if chosen_stat.value >= 10:
             success_threshold -= 1
         print(f"Attempting to solve the challenge with {chosen_stat.name}...")
@@ -107,6 +144,17 @@ class Event:
             self.status = EventStatus.FAIL
             print(f"{character.name} attempted to use {chosen_stat.name} but failed.")
             print(self.fail_message)
+    
+    def award_item(self, character: Character):
+        if random.random() < 0.2:
+            possible_items = [
+                Item("Wizard's Cloak", "Agility", 2),
+                Item("Book of Spells", "Intelligence", 3),
+                Item("Strength Potion", "Strength", 4)
+            ]
+
+            awarded_item = random.choice(possible_items)
+            awarded_item.apply_boost(character)
 
 
 class Location:
@@ -150,6 +198,18 @@ class Game:
         voldemort_events = [event for event in location.events if event.is_voldemort_event]
 
         for _ in range(rounds):
+            if self.character.inventory:
+                print(f"{self.character.name}'s Inventory: {[item.name for item in self.character.inventory]}")
+                use_item = input("Do you wnat to use an item? Enter the name of the item or 'no': ").strip().lower()
+
+                if use_item != "no":
+                    if self.character.use_item(use_item):
+                        print(f"{self.character.name} used {use_item}!")
+                    else:
+                        print(f"{use_item} is not in the inventory.")
+            else:
+                print(f"{self.character.name} has no items to use.")
+
             event = random.choice(voldemort_events)
             event.execute(self.character, self.parser)
 
