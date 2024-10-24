@@ -1,6 +1,6 @@
 [
     {
-        "primary_attribute": "Agililty",
+        "primary_attribute": "Agility",
         "secondary_attribute": "Strength",
         "prompt_text": "A fast-moving spell is coming your way. What will you do?",
         "options": [
@@ -52,7 +52,7 @@
             "message": "You misread an ingredient, and the potion exploded!"
         },
         "partial_pass": {
-            "message": "The potion brewed, but its effecs are uncertain..."
+            "message": "The potion brewed, but its effects are uncertain..."
         },
         "is_voldemort_event": false
     },

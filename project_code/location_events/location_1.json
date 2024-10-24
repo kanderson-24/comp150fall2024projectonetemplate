@@ -15,6 +15,7 @@
     },
     "partial_pass": {
       "message": "You managed to solve the riddle or push the door, but not both. You made some progress, but the door remains closed."
-    }
+    },
+    "is_voldemort_event": false
   }
 ]

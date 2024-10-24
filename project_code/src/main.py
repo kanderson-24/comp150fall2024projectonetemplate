@@ -38,7 +38,7 @@ class Character:
         return f"Character: {self.name}" + f" ({type(self).__name__})" + f"\nStats: {', '.join([str(stat) for stat in self.statistics])}"
 
     def get_stats(self):
-        return self.statistics # Extend this list if there are more stats
+        return self.statistics
     
     def add_item_to_inventory(self, item):
         self.inventory.append(item)
@@ -69,10 +69,12 @@ class Student(Character):
         super().__init__(name)
         if name == "Harry Potter":
             self.primary_stat = "Agility"
-        if name == "Hermione Granger":
+        elif name == "Hermione Granger":
             self.primary_stat = "Intelligence"
-        if name == "Ron Weasley":
+        elif name == "Ron Weasley":
             self.primary_stat = "Strength"
+        else:
+            self.primary_stat = "Intelligence"
 
         self.strength = Statistic("Strength", value=5, description="Physical power of the student.")
         self.statistics.append(self.strength)
@@ -114,13 +116,26 @@ class Event:
         for idx, option in enumerate(self.options):
             print(f"{idx + 1}. {option['choice_text']}")
 
-        choice = int(parser.parse("Enter the number of your choice: ")) - 1
+        while True:
+            try:
+                choice_input = parser.parse("Enter the number of your choice: ")
+                choice = int(choice_input) - 1
+                if 0 <= choice < len(self.options):
+                    break
+                else:
+                    print("Invalid choice number. Please select a valid option.")
+            except ValueError:
+                print("Invalid input. Please enter a number corresponding to your choice.")
+        
         selected_option = self.options[choice]
         chosen_stat_name = selected_option['associated_stat']
 
         chosen_stat = next(stat for stat in character.get_stats() if stat.name == chosen_stat_name)
 
         self.resolve_choice(character, chosen_stat)
+
+        if self.status == EventStatus.PASS:
+            self.award_item(character)
 
     def resolve_choice(self, character: Character, chosen_stat: Statistic):
         dice_roll = roll_dice()
@@ -155,6 +170,7 @@ class Event:
 
             awarded_item = random.choice(possible_items)
             awarded_item.apply_boost(character)
+            print(f"You received a new item: {awarded_item.name}!")
 
 
 class Location:
@@ -170,37 +186,41 @@ class Game:
         self.character = character
         self.locations = locations
         self.continue_playing = True
-        self.voldemort_defeated = False
-        self.events_completed = 0
-        self.required_events_to_trigger_battle = 3
+        self.event_completed = 0
+        self.battles = ["Draco", "Snape", "Voldemort"]
+        self.current_battle_index = 0
 
     def start(self):
-        while self.continue_playing:
+        while self.continue_playing and self.current_battle_index < len(self.battles):
+            self.run_challenges(3)
+            self.battle(self.battles[self.current_battle_index])
+            self.current_battle_index += 1
+        print("Game Over.")
+
+    def run_challenges(self, num_challenges):
+        challenges_completed = 0
+        while challenges_completed < num_challenges and self.continue_playing:
             location = random.choice(self.locations)
             regular_events = [event for event in location.events if not event.is_voldemort_event]
             event = random.choice(regular_events)
             event.execute(self.character, self.parser)
 
             if event.status == EventStatus.PASS:
-                self.events_completed += 1
-                print(f"Completed events: {self.events_completed}/{self.required_events_to_trigger_battle}")
-            if self.events_completed >= self.required_events_to_trigger_battle:
-                self.voldemort_battle()
-                break
-        print("Game Over.")
+                challenges_completed += 1
+                print(f"Challenges completed: {challenges_completed}/{num_challenges}")
+            else:
+                print("You need to pass the challenge to proceed.")
     
-    def voldemort_battle(self):
-        print("Dumbledore: This it it... your final battle against Voldemort!")
+    def battle(self, opponent_name):
+        print(f"Dumbledore: Prepare yourself, you are about to face {opponent_name}!")
         rounds = 2
-        success_count = 0
-
-        location = random.choice(self.locations)
-        voldemort_events = [event for event in location.events if event.is_voldemort_event]
+        player_score = 0
+        opponent_score = 0
 
         for _ in range(rounds):
             if self.character.inventory:
                 print(f"{self.character.name}'s Inventory: {[item.name for item in self.character.inventory]}")
-                use_item = input("Do you wnat to use an item? Enter the name of the item or 'no': ").strip().lower()
+                use_item = self.parser.parse("Do you wnat to use an item? Enter the name of the item or 'no': ").strip().lower()
 
                 if use_item != "no":
                     if self.character.use_item(use_item):
@@ -210,26 +230,24 @@ class Game:
             else:
                 print(f"{self.character.name} has no items to use.")
 
-            event = random.choice(voldemort_events)
-            event.execute(self.character, self.parser)
+            player_roll = roll_dice()
+            opponent_roll = roll_dice()
+            print(f"You rolled: {player_roll}")
+            print(f"{opponent_name} rolled: {opponent_roll}")
 
-            if event.status == EventStatus.PASS:
-                success_count += 1
-            elif event.status == EventStatus.FAIL:
-                success_count -= 1
-        
-            if success_count > 0:
-                print(f"Well done! You have the upper hand over Voldemort!")
+            if player_roll > opponent_roll:
+                player_score += 1
+                print(f"You won this round against {opponent_name}!")
             else:
-                print(f"Voldemort is gaining the upper hand")
-
-        if success_count > 0:
-            print("Congratulations! You have defeated Voldemort!")
-            self.voldemort_defeated = True
-        else:
-            print("Voldemort has defeated you... Better luck next time.")
-
-        self.continue_playing = False
+                opponent_score += 1
+                print(f"{opponent_name} won this round!")
+            if player_score == 2:
+                print(f"Congratulations! You have defeated {opponent_name}!")
+                break
+            elif opponent_score == 2:
+                print(f"{opponent_name} has defeated you... Game Over.")
+                self.continue_playing = False
+                break
 
 class UserInputParser:
     def parse(self, prompt: str) -> str:
@@ -273,7 +291,7 @@ def start_game():
         print(f"{number}. {character.name}")
 
     while True:
-        character_choice = input("Enter the number or name of the character you want to play as: ").strip().lower()
+        character_choice = parser.parse("Enter the number or name of the character you want to play as: ").strip().lower()
 
         # Check if the input is a valid number
         if character_choice in character_names:
