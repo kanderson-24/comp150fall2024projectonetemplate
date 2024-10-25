@@ -41,8 +41,9 @@ class Character:
         return self.statistics
     
     def add_item_to_inventory(self, item):
-        self.inventory.append(item)
-        print(f"{self.name} added {item.name} to their inventory!")
+        if item.name not in [existing_item.name for existing_item in self.inventory]:
+            self.inventory.append(item)
+            print(f"{self.name} added {item.name} to their inventory!")
 
     def use_item(self, item_name):
         for item in self.inventory:
@@ -141,7 +142,7 @@ class Event:
         dice_roll = roll_dice()
         print(f"Dice roll: {dice_roll}")
 
-        success_threshold = 4
+        success_threshold = 5
         if chosen_stat.name == character.primary_stat:
             print(f"{character.name} is using their primary stat: {chosen_stat.name}")
             success_threshold -= 1
@@ -161,16 +162,19 @@ class Event:
             print(self.fail_message)
     
     def award_item(self, character: Character):
-        if random.random() < 0.2:
+        if random.random() < 0.1:
             possible_items = [
                 Item("Wizard's Cloak", "Agility", 2),
                 Item("Book of Spells", "Intelligence", 3),
                 Item("Strength Potion", "Strength", 4)
             ]
 
-            awarded_item = random.choice(possible_items)
-            awarded_item.apply_boost(character)
-            print(f"You received a new item: {awarded_item.name}!")
+            available_items = [item for item in possible_items if item.name not in [i.name for i in character.inventory]]
+            if available_items:
+                awarded_item = random.choice(available_items)
+                character.add_item_to_inventory(awarded_item)
+                awarded_item.apply_boost(character)
+                print(f"You received a new item: {awarded_item.name}!")
 
 
 class Location:
@@ -213,38 +217,66 @@ class Game:
     
     def battle(self, opponent_name):
         print(f"Dumbledore: Prepare yourself, you are about to face {opponent_name}!")
+            
+            # Define battle options similar to event options
+        battle_options = [
+            {"choice_text": "Attack with physical strength", "associated_stat": "Strength"},
+            {"choice_text": "Outsmart the opponent", "associated_stat": "Intelligence"},
+            {"choice_text": "Dodge and counterattack", "associated_stat": "Agility"}
+        ]
+
         rounds = 2
         player_score = 0
         opponent_score = 0
 
-        for _ in range(rounds):
-            if self.character.inventory:
-                print(f"{self.character.name}'s Inventory: {[item.name for item in self.character.inventory]}")
-                use_item = self.parser.parse("Do you wnat to use an item? Enter the name of the item or 'no': ").strip().lower()
+        while player_score < rounds and opponent_score < rounds:
+            # Display battle options for player to choose
+            print("What will you do?")
+            for idx, option in enumerate(battle_options):
+                print(f"{idx + 1}. {option['choice_text']}")
 
-                if use_item != "no":
-                    if self.character.use_item(use_item):
-                        print(f"{self.character.name} used {use_item}!")
+            # Player selects an option
+            while True:
+                try:
+                    choice_input = self.parser.parse("Enter the number of your choice: ")
+                    choice = int(choice_input) - 1
+                    if 0 <= choice < len(battle_options):
+                        break
                     else:
-                        print(f"{use_item} is not in the inventory.")
-            else:
-                print(f"{self.character.name} has no items to use.")
+                        print("Invalid choice number. Please select a valid option.")
+                except ValueError:
+                    print("Invalid input. Please enter a number corresponding to your choice.")
+                
+            selected_option = battle_options[choice]
+            chosen_stat_name = selected_option['associated_stat']
 
-            player_roll = roll_dice()
-            opponent_roll = roll_dice()
-            print(f"You rolled: {player_roll}")
-            print(f"{opponent_name} rolled: {opponent_roll}")
+            # Locate the chosen stat for the battle
+            chosen_stat = next(stat for stat in self.character.get_stats() if stat.name == chosen_stat_name)
 
-            if player_roll > opponent_roll:
+            # Dice roll and success threshold, incorporating primary stat bonus
+            dice_roll = roll_dice()
+            success_threshold = 5  # Higher threshold for battles to increase difficulty
+            if chosen_stat.name == self.character.primary_stat:
+                print(f"{self.character.name} is using their primary stat: {chosen_stat.name}")
+                success_threshold -= 1
+            if chosen_stat.value >= 10:
+                success_threshold -= 1
+
+            print(f"Dice roll: {dice_roll}")
+            print(f"Attempting to fight {opponent_name} with {chosen_stat.name}...")
+
+            # Determine outcome based on stat and success threshold
+            if dice_roll >= success_threshold:
+                print(f"{self.character.name} successfully attacked {opponent_name}!")
                 player_score += 1
-                print(f"You won this round against {opponent_name}!")
             else:
+                print(f"{opponent_name} defended successfully!")
                 opponent_score += 1
-                print(f"{opponent_name} won this round!")
-            if player_score == 2:
+
+            # Check for battle conclusion
+            if player_score == rounds:
                 print(f"Congratulations! You have defeated {opponent_name}!")
-                break
-            elif opponent_score == 2:
+            elif opponent_score == rounds:
                 print(f"{opponent_name} has defeated you... Game Over.")
                 self.continue_playing = False
                 break
