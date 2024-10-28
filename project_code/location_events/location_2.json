@@ -46,7 +46,7 @@
             {"choice_text": "Quickly mix the ingredients and hope for the best", "associated_stat": "Agility"}
         ],
         "pass": {
-            "message": "Your knowledge of potions paid off! You successfully brewed the potion and gained a useful item."
+            "message": "Your knowledge of potions paid off! You successfully brewed the potion."
         },
         "fail": {
             "message": "You misread an ingredient, and the potion exploded!"
@@ -74,6 +74,74 @@
             "message": "You wobbled but managed to stay on your feet."
         },
         "is_voldemort_event": false
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Intelligence",
+        "prompt_text": "Draco casts a dark spell your way! What will you do?",
+        "options": [
+            {"choice_text": "Dodge the spell by moving quickly", "associated_stat": "Agility"},
+            {"choice_text": "Block the spell with a shielding spell", "associated_stat": "Intelligence"}
+        ],
+        "pass": {
+            "message": "You blocked Draco's dark spell and remain unharmed!"
+        },
+        "fail": {
+            "message": "The spell hit you, and you're momentarily set back!"
+        },
+        "is_battle_event": true,
+        "battle_event_for": "Draco"
+    },
+    {
+        "primary_attribute": "Agility",
+        "secondary_attribute": "Strength",
+        "prompt_text": "Draco fires a rapid curse towards you! How do you respond?",
+        "options": [
+            {"choice_text": "Dodge to the side", "associated_stat": "Agility"},
+            {"choice_text": "Deflect the curse with brute force", "associated_stat": "Strength"}
+        ],
+        "pass": {
+            "message": "You dodged Draco's curse with ease!"
+        },
+        "fail": {
+            "message": "The curse hits you, leaving you stunned!"
+        },
+        "is_battle_event": true,
+        "battle_event_for": "Draco"
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Intelligence",
+        "prompt_text": "Snape casts a powerful disarming spell. How will you react?",
+        "options": [
+            {"choice_text": "Resist with sheer strength", "associated_stat": "Strength"},
+            {"choice_text": "Outsmart Snape's spell", "associated_stat": "Intelligence"}
+        ],
+        "pass": {
+            "message": "You resisted Snape's disarming spell!"
+        },
+        "fail": {
+            "message": "Snape's spell disarms you!"
+        },
+        "is_battle_event": true,
+        "battle_event_for": "Snape"
+    },
+    {
+        "primary_attribute": "Intelligence",
+        "secondary_attribute": "Agility",
+        "prompt_text": "Snape conjures a blinding fog around you. What's your move?",
+        "options": [
+            {"choice_text": "Dispel the fog with a spell", "associated_stat": "Intelligence"},
+            {"choice_text": "Move quickly to evade", "associated_stat": "Agility"}
+        ],
+        "pass": {
+            "message": "You dispelled the fog and prepared for your next move!"
+        },
+        "fail": {
+            "message": "The fog disorients you, leaving you vulnerable!"
+        },
+        "is_battle_event": true,
+        "battle_event_for": "Snape"
     },
     {
         "primary_attribute": "Intelligence", 

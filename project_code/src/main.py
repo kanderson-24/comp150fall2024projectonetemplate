@@ -107,9 +107,9 @@ class Event:
         self.options = data['options']
         self.pass_message = data['pass']['message']
         self.fail_message = data['fail']['message']
-        self.partial_pass_message = data['partial_pass']['message']
+        self.partial_pass_message = data.get('partial_pass', {}).get('message', None)
         self.status = EventStatus.UNKNOWN
-        self.is_voldemort_event = data.get('is_voldemort_event', False)
+        self.is_voldemort_event = data.get('is_voldemort_event', False)    
 
     def execute(self, character: Character, parser):
         print(f"Dumbledore: {self.prompt_text}")
@@ -185,10 +185,11 @@ class Location:
         return random.choice(self.events)
 
 class Game:
-    def __init__(self, parser, character: Character, locations: List[Location]):
+    def __init__(self, parser, character: Character, locations: List[Location], battle_events: dict):
         self.parser = parser
         self.character = character
         self.locations = locations
+        self.battle_events = battle_events 
         self.continue_playing = True
         self.event_completed = 0
         self.battles = ["Draco", "Snape", "Voldemort"]
@@ -217,45 +218,51 @@ class Game:
     
     def battle(self, opponent_name):
         print(f"Dumbledore: Prepare yourself, you are about to face {opponent_name}!")
-            
-            # Define battle options similar to event options
-        battle_options = [
-            {"choice_text": "Attack with physical strength", "associated_stat": "Strength"},
-            {"choice_text": "Outsmart the opponent", "associated_stat": "Intelligence"},
-            {"choice_text": "Dodge and counterattack", "associated_stat": "Agility"}
-        ]
+
+        battle_events_for_opponent = self.battle_events.get(opponent_name, [])
 
         rounds = 2
         player_score = 0
         opponent_score = 0
 
         while player_score < rounds and opponent_score < rounds:
-            # Display battle options for player to choose
+            if self.character.inventory:
+                print(f"{self.character.name}'s Inventory: {[item.name for item in self.character.inventory]}")
+                use_item = self.parser.parse("Do you want to use an item? Enter the name of the item or 'no': ").strip().lower()
+
+                if use_item != "no":
+                    if self.character.use_item(use_item):
+                        print(f"{self.character.name} used {use_item}!")
+                    else:
+                        print(f"{use_item} is not in the inventory.")
+            else:
+                print(f"{self.character.name} has no items to use.")
+
+            battle_event = random.choice(battle_events_for_opponent)
+            print(f"{opponent_name} {battle_event['prompt_text']}")
+
             print("What will you do?")
-            for idx, option in enumerate(battle_options):
+            for idx, option in enumerate(battle_event['options']):
                 print(f"{idx + 1}. {option['choice_text']}")
 
-            # Player selects an option
             while True:
                 try:
                     choice_input = self.parser.parse("Enter the number of your choice: ")
                     choice = int(choice_input) - 1
-                    if 0 <= choice < len(battle_options):
+                    if 0 <= choice < len(battle_event['options']):
                         break
                     else:
                         print("Invalid choice number. Please select a valid option.")
                 except ValueError:
                     print("Invalid input. Please enter a number corresponding to your choice.")
                 
-            selected_option = battle_options[choice]
+            selected_option = battle_event.options[choice]
             chosen_stat_name = selected_option['associated_stat']
 
-            # Locate the chosen stat for the battle
             chosen_stat = next(stat for stat in self.character.get_stats() if stat.name == chosen_stat_name)
 
-            # Dice roll and success threshold, incorporating primary stat bonus
             dice_roll = roll_dice()
-            success_threshold = 5  # Higher threshold for battles to increase difficulty
+            success_threshold = 5  
             if chosen_stat.name == self.character.primary_stat:
                 print(f"{self.character.name} is using their primary stat: {chosen_stat.name}")
                 success_threshold -= 1
@@ -265,7 +272,6 @@ class Game:
             print(f"Dice roll: {dice_roll}")
             print(f"Attempting to fight {opponent_name} with {chosen_stat.name}...")
 
-            # Determine outcome based on stat and success threshold
             if dice_roll >= success_threshold:
                 print(f"{self.character.name} successfully attacked {opponent_name}!")
                 player_score += 1
@@ -273,7 +279,6 @@ class Game:
                 print(f"{opponent_name} defended successfully!")
                 opponent_score += 1
 
-            # Check for battle conclusion
             if player_score == rounds:
                 print(f"Congratulations! You have defeated {opponent_name}!")
             elif opponent_score == rounds:
@@ -303,7 +308,18 @@ class UserInputParser:
 def load_events_from_json(file_path: str) -> List[Event]:
     with open(file_path, 'r') as file:
         data = json.load(file)
-    return [Event(event_data) for event_data in data]
+    regular_events = []
+    battle_events = {"Draco": [], "Snape": [], "Voldemort": []}
+
+    for event_data in data:
+        event = Event(event_data)
+        if event_data.get("is_battle_event", False):
+            opponent = event_data.get("battle_event_for")
+            if opponent and opponent in battle_events:
+                battle_events[opponent].append(event)
+        else:
+            regular_events.append(event)
+    return regular_events, battle_events
 
 def start_game():
     parser = UserInputParser()
@@ -325,7 +341,6 @@ def start_game():
     while True:
         character_choice = parser.parse("Enter the number or name of the character you want to play as: ").strip().lower()
 
-        # Check if the input is a valid number
         if character_choice in character_names:
             chosen_character = next(character for character in characters if character.name.lower() == character_names[character_choice].lower())
             break  # Exit the loop after a valid choice
@@ -336,15 +351,11 @@ def start_game():
         else:
             print("Invalid input. Please enter either the number or name of a character (Harry Potter, Hermione Granger, Ron Weasley).")
 
-    # Proceed with the chosen character
     print(f"You have chosen: {chosen_character.name}")
 
-    events_location_1 = load_events_from_json('project_code/location_events/location_1.json')
-    events_location_2 = load_events_from_json('project_code/location_events/location_2.json')
-
-    all_events = events_location_1 + events_location_2
-    locations = [Location(all_events)]
-    game = Game(parser, chosen_character, locations)
+    regular_events, battle_events = load_events_from_json('project_code/location_events/location_2.json')
+    locations = [Location(regular_events)]
+    game = Game(parser, chosen_character, locations, battle_events)
     game.start()
 
 if __name__ == '__main__':
