@@ -217,10 +217,11 @@ class Game:
                 print("You need to pass the challenge to proceed.")
     
     def battle(self, opponent_name):
+        opponent_name = opponent_name.capitalize()
         print(f"Dumbledore: Prepare yourself, you are about to face {opponent_name}!")
 
         battle_events_for_opponent = self.battle_events.get(opponent_name, [])
-
+        
         rounds = 2
         player_score = 0
         opponent_score = 0
@@ -228,28 +229,32 @@ class Game:
         while player_score < rounds and opponent_score < rounds:
             if self.character.inventory:
                 print(f"{self.character.name}'s Inventory: {[item.name for item in self.character.inventory]}")
-                use_item = self.parser.parse("Do you want to use an item? Enter the name of the item or 'no': ").strip().lower()
 
-                if use_item != "no":
-                    if self.character.use_item(use_item):
+                while True:
+                    use_item = self.parser.parse("Do you want to use an item? Enter the name of the item or 'no': ").strip().lower()
+
+                    if use_item == "no":
+                        break
+                    elif self.character.use_item(use_item):
                         print(f"{self.character.name} used {use_item}!")
+                        break
                     else:
-                        print(f"{use_item} is not in the inventory.")
+                        print(f"{use_item} is not in the inventory. Please enter a valid item name or 'no'.")
             else:
                 print(f"{self.character.name} has no items to use.")
-
+         
             battle_event = random.choice(battle_events_for_opponent)
-            print(f"{opponent_name} {battle_event['prompt_text']}")
+            print(f"{opponent_name} {battle_event.prompt_text}")
 
             print("What will you do?")
-            for idx, option in enumerate(battle_event['options']):
+            for idx, option in enumerate(battle_event.options):
                 print(f"{idx + 1}. {option['choice_text']}")
 
             while True:
                 try:
                     choice_input = self.parser.parse("Enter the number of your choice: ")
                     choice = int(choice_input) - 1
-                    if 0 <= choice < len(battle_event['options']):
+                    if 0 <= choice < len(battle_event.options):
                         break
                     else:
                         print("Invalid choice number. Please select a valid option.")
@@ -343,11 +348,10 @@ def start_game():
 
         if character_choice in character_names:
             chosen_character = next(character for character in characters if character.name.lower() == character_names[character_choice].lower())
-            break  # Exit the loop after a valid choice
-        # Check if the input is a valid character name
+            break
         elif character_choice in (name.lower() for name in character_names.values()):
             chosen_character = next(character for character in characters if character.name.lower() == character_choice)
-            break  # Exit the loop after a valid choice
+            break
         else:
             print("Invalid input. Please enter either the number or name of a character (Harry Potter, Hermione Granger, Ron Weasley).")
 

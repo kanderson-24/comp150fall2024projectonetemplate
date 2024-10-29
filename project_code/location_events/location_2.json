@@ -160,7 +160,8 @@
         "partial_pass": {
             "message": "You dodged most of the curse, but it grazed you!"
         },
-        "is_voldemort_event": true
+        "is_battle_event": true,
+        "battle_event_for": "Voldemort"
     },
     {
         "primary_attribute": "Strength",
@@ -179,6 +180,7 @@
         "partial_pass": {
             "message": "You pushed Voldemort back, but the fight continues!"
         },
-        "is_voldemort_event": true
+        "is_battle_event": true,
+        "battle_event_for": "Voldemort"
     }
 ]
