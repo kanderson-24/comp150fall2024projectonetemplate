@@ -164,9 +164,21 @@ class Event:
     def award_item(self, character: Character):
         if random.random() < 0.1:
             possible_items = [
-                Item("Wizard's Cloak", "Agility", 2),
+                Item("Invisibility Cloak", "Agility", 3),
                 Item("Book of Spells", "Intelligence", 3),
-                Item("Strength Potion", "Strength", 4)
+                Item("Strength Potion", "Strength", 4),
+                Item("Elixir of Insight", "Intelligence", 3),
+                Item("Felix Felicis Potion", "Agility", 4),
+                Item("Strength of Giants Potion", "Strength", 3),
+                Item("Ravenclaw's Diadem", "Intelligence", 4),
+                Item("Firebolt Broomstick", "Agility", 2),
+                Item("Amulet of Gryffindor", "Strength", 5),
+                Item("Wand of Elder Wood", "Intelligence", 5),
+                Item("Hermione's Time Turner", "Intelligence", 4),
+                Item("Quidditch Gloves", "Strength", 2),
+                Item("Dragonhide Armor", "Agility", 2),
+                Item("Polyjuice Potion", "Strength", 3),
+                Item("Phoenix Feather Charm", "Agility", 5)
             ]
 
             available_items = [item for item in possible_items if item.name not in [i.name for i in character.inventory]]

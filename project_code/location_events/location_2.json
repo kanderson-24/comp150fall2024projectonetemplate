@@ -76,6 +76,101 @@
         "is_voldemort_event": false
     },
     {
+        "primary_attribute": "Intelligence",
+        "secondary_attribute": "Strength",
+        "prompt_text": "You encounter a riddle on an ancient stone. Do you solve it?",
+        "options": [
+            {"choice_text": "Solve the riddle using logic", "associated_stat": "Intelligence"},
+            {"choice_text": "Forcefully remove the stone out of the way", "associated_stat": "Strength"}
+        ],
+        "pass": {
+            "message": "Your intellect cracked the riddle, revealing a hidden path!"
+        },
+        "fail": {
+            "message": "The riddle remains unsolved, blocking your way."
+        },
+        "partial_pass": {
+            "message": "You decipher some clues, but the solution eludes you."
+        },
+        "is_voldemort_event": false
+    },
+    {
+        "primary_attribute": "Agility",
+        "secondary_attribute": "Intelligence",
+        "prompt_text": "A narrow ledge stretches along a cliffside. How will you proceed?",
+        "options": [
+            {"choice_text": "Edge along carefully", "associated_stat": "Agility"},
+            {"choice_text": "Analyze the ledge for stable spots", "associated_stat": "Intelligence"}
+        ],
+        "pass": {
+            "message": "You defly navigated the ledge and reached the other side."
+        },
+        "fail": {
+            "message": "You slipped and fell, luckily landing on a lower ledge!"
+        },
+        "partial_pass": {
+            "message": "You stumble but manage to hold on, continuing carefully."
+        },
+        "is_voldemort_event": false
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Agility",
+        "prompt_text": "A heavy gate blocks your path. What will you do?",
+        "options": [
+            {"choice_text": "Lift the gate with all your might", "associated_stat": "Strength"},
+            {"choice_text": "Find a way to slip through a gap", "associated_stat": "Agility"}
+        ],
+        "pass": {
+            "message": "With great effort, you lifted the gate and moved forward."
+        },
+        "fail": {
+            "message": "The gate doesn't budge, blocking your way."
+        },
+        "partial_pass": {
+            "message": "You lift it slightly, enough to squeeze through."
+        },
+        "is_voldemort_event": false
+    },
+    {
+        "primary_attribute": "Intelligence",
+        "secondary_attribute": "Agility",
+        "prompt_text": "You find an ancient, cryptic map. Do you decipher it?",
+        "options": [
+            {"choice_text": "Carefully study the symbols", "associated_stat": "Intelligence"},
+            {"choice_text": "Trace the map with quick glances", "associated_stat": "Agility"}
+        ],
+        "pass": {
+            "message": "You deciphered the map, revealing a shortcut!"
+        },
+        "fail": {
+            "message": "THe map remains incomprehensible, leaving you lost."
+        },
+        "partial_pass": {
+            "message": "You understand some parts, enough to move in the right direction."
+        },
+        "is_voldemort_event": false
+    },
+    {
+        "primary_attribute": "Strength",
+        "secondary_attribute": "Intelligence",
+        "prompt_text": "A wild creature appears, blocking your path. What will you do?",
+        "options": [
+            {"choice_text": "Defend yourself with strength", "associated_stat": "Strength"},
+            {"choice_text": "Distract it with a clever trick", "associated_stat": "Intelligence"}
+        ],
+        "pass": {
+            "message": "You subdued the creature and safely passed."
+        },
+        "fail": {
+            "message": "The creature attacks, forcing you to retreat!"
+        },
+        "partial_pass": {
+            "message": "You held it off but sustained minor injuries."
+        },
+        "is_voldemort_event": false
+    },
+    {
         "primary_attribute": "Strength",
         "secondary_attribute": "Intelligence",
         "prompt_text": "Draco casts a dark spell your way! What will you do?",
