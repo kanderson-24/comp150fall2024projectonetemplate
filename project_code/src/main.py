@@ -377,4 +377,4 @@ def start_game():
 if __name__ == '__main__':
     start_game()
 
-# finished double checked 11/4
+# finished double checked 11/5
